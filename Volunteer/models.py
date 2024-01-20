@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,BaseUserManager
 
-class VolunteerManager(BaseUserManager):
+"""class VolunteerManager(BaseUserManager):
     def create_volunteer(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_volunteer', True)
         return self._create_user(email, password, **extra_fields)
@@ -14,27 +14,21 @@ class VolunteerManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
+"""
 
-
-class Volunteer(AbstractBaseUser):
+class Volunteer(models.Model):
     Gender_Type = [
         ("MALE","Male"),
         ("FEMALE","Female"),
         ("OTHERS","Others"),
     ]
-    username = None
-    email = models.EmailField(unique=True)
-    is_volunteer = models.BooleanField(default=True)
+    email = models.EmailField(unique=True) # --login( username )--
+    is_volunteer = models.BooleanField(default=True) 
     Volunteer_ID = models.IntegerField(primary_key=True,unique = True)
     Name = models.CharField(max_length=20)
     Gender = models.CharField(max_length=6,choices = Gender_Type)
     Age = models.IntegerField()
     Location = models.CharField(max_length=20)
-    
-    objects = VolunteerManager()
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['volunteer_id', 'name', 'gender', 'age', 'location']
 
     def __str__(self):
         return self.Name
