@@ -2,6 +2,27 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,BaseUserManager 
 # Create your models here.
 
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, role, password=None, **extra_fields):
+        if not email:
+            raise ValueError('The Email field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, role=role, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, role, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+        return self.create_user(email, role, password, **extra_fields)
+
+
 class User(AbstractBaseUser):
     username = None
     email = models.EmailField(unique=True)
@@ -10,7 +31,7 @@ class User(AbstractBaseUser):
         ("Vol","volunteer")
     )
     Role = models.CharField(choices = user_type, max_length=50)
-
+    objects = CustomUserManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['Role']
 
@@ -31,6 +52,7 @@ class volunteer(models.Model):
     Gender = models.CharField(choices = Gender_type,max_length=50)
     Age = models.PositiveIntegerField()
     Location = models.CharField(max_length=50)
+    profile_img = models.ImageField(upload_to='vol_profile/', null=True, blank=True)
 
     def __str__(self):
         return self.Name
@@ -43,7 +65,7 @@ class Org(models.Model):
     Org_ID = models.PositiveIntegerField(primary_key=True,unique = True) 
     Org_Name = models.CharField(max_length = 20)
     Location =models.CharField(max_length=50) 
-    verify = models.BooleanField(default =False)
+    verified = models.BooleanField(default =False)
 
     def __str__(self):
         return self.Org_Name
@@ -58,7 +80,9 @@ class Events(models.Model):
     Size_of_Event = models.PositiveIntegerField(verbose_name="Size of Event")
     Event_Name = models.CharField(max_length=20, verbose_name="Event Name")
     Location = models.CharField(max_length=20, verbose_name="Location")
+    poster = models.ImageField(upload_to='Event_images/', null=True, blank=True)
     Created_Org = models.ForeignKey(Org, related_name='conducting_Org', on_delete=models.CASCADE) # conducting organization
+    Registration_option = models.BooleanField(default = True)
 
     Event_Date = models.DateTimeField(null = True)
     
