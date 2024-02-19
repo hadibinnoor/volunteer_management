@@ -17,7 +17,8 @@ from base.serializers import EventSerializer,Vols_Serializer,Orgs_serializer
 @api_view(['GET'])
 def events(request):
     e_obj = Events.objects.all()
-    serilizer = EventSerializer(e_obj,many = True)
+    serilizer = EventSerializer(e_obj,many = True) 
+    print(serilizer.data)
     return Response(serilizer.data)
 
 
