@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,BaseUserManager 
 # Create your models here.
+import os
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, Role, password=None, **extra_fields):
@@ -75,18 +76,17 @@ class Org(models.Model):
 
 class Events(models.Model):
 
-    Event_ID = models.BigAutoField(primary_key=True,unique=True)
+    Event_ID = models.BigAutoField(primary_key=True,unique=True,)
     Event_Description = models.TextField()
     Number_of_Volunteer = models.PositiveIntegerField(verbose_name="Number of Volunteers")
     Size_of_Event = models.PositiveIntegerField(verbose_name="Size of Event")
     Event_Name = models.CharField(max_length=20, verbose_name="Event Name")
-    Event_disription = models.TextField(verbose_name="Event Discription", default="Test dicription")
     Location = models.CharField(max_length=20, verbose_name="Location")
-    poster = models.ImageField(null=True, blank=True)
+    poster = models.ImageField(upload_to='posters/',null=True,blank=True)
     Created_Org = models.ForeignKey(Org, related_name='conducting_Org', on_delete=models.CASCADE) # conducting organization
     Registration_option = models.BooleanField(default = True)
-
-    Event_Date = models.DateTimeField(null = True)
+    poster_url = models.TextField(blank=True,null=True)
+    Event_Date = models.DateTimeField(null = True,blank = True)
     
     Event_type = [
         ("PAST","Past"),
@@ -96,7 +96,24 @@ class Events(models.Model):
     def __str__(self):
         return self.Event_Name
     
-    
+    def save(self, *args, **kwargs):
+        # Remove the if condition checking for self.Event_ID
+        print(self.Event_ID)
+        existing_instance = None
+        if self.pk:  # Check if the instance has already been saved
+            existing_instance = Events.objects.get(pk=self.pk)
+           
+            if existing_instance.poster != self.poster:
+                # Delete the old image file
+                if existing_instance.poster:
+                    path = existing_instance.poster.path
+                    if os.path.isfile(path):
+                        os.remove(path)
+
+        if self.poster:
+            self.poster_url = f"poster/media/{self.pk}/file/"
+
+        super().save(*args, **kwargs)
 class registered(models.Model):
     vol = models.ForeignKey(volunteer, related_name = "reg_vol", on_delete=models.CASCADE)
     event = models.ForeignKey(Events, related_name = "event", on_delete=models.CASCADE)
