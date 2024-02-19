@@ -3,16 +3,16 @@ from django.contrib.auth.models import AbstractBaseUser,BaseUserManager
 # Create your models here.
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, role, password=None, **extra_fields):
+    def create_user(self, email, Role, password=None, **extra_fields):
         if not email:
             raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
-        user = self.model(email=email, role=role, **extra_fields)
+        user = self.model(email=email, Role=Role, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, role, password=None, **extra_fields):
+    def create_superuser(self, email, Role, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
@@ -20,7 +20,7 @@ class CustomUserManager(BaseUserManager):
             raise ValueError('Superuser must have is_staff=True.')
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
-        return self.create_user(email, role, password, **extra_fields)
+        return self.create_user(email, Role, password, **extra_fields)
 
 
 class User(AbstractBaseUser):
@@ -47,7 +47,7 @@ class volunteer(models.Model):
         ("OTHERS","Others")
     ]
     user = models.OneToOneField(User, related_name ="vol_profile",on_delete=models.CASCADE)
-    Vol_ID = models.IntegerField(primary_key =True,unique =True)
+    Vol_ID = models.BigAutoField(primary_key=True,unique=True)
     Name = models.CharField(max_length=20)
     Gender = models.CharField(choices = Gender_type,max_length=50)
     Age = models.PositiveIntegerField()
@@ -62,7 +62,7 @@ class volunteer(models.Model):
 
 class Org(models.Model):
     user =models.OneToOneField(User, related_name = "org_profile", on_delete=models.CASCADE)
-    Org_ID = models.PositiveIntegerField(primary_key=True,unique = True) 
+    Org_ID = models.BigAutoField(primary_key=True,unique=True)
     Org_Name = models.CharField(max_length = 20)
     Location =models.CharField(max_length=50) 
     verified = models.BooleanField(default =False)
@@ -76,6 +76,7 @@ class Org(models.Model):
 class Events(models.Model):
 
     Event_ID = models.BigAutoField(primary_key=True,unique=True)
+    Event_Description = models.TextField()
     Number_of_Volunteer = models.PositiveIntegerField(verbose_name="Number of Volunteers")
     Size_of_Event = models.PositiveIntegerField(verbose_name="Size of Event")
     Event_Name = models.CharField(max_length=20, verbose_name="Event Name")
@@ -101,4 +102,4 @@ class registered(models.Model):
     event = models.ForeignKey(Events, related_name = "event", on_delete=models.CASCADE)
 
     def __str__(*self):
-        return f"ff"
+        return f"Reg_member"

@@ -34,3 +34,29 @@ def oranizations(request):
     Org_obj = Org.objects.all()
     or_serializer = Orgs_serializer(Org_obj,many=True)
     return Response(or_serializer.data)
+
+
+
+# -----Details of Volunteer ------
+
+@api_view(['GET'])
+def Volunteer_details(request,vd):
+    vol_obj = volunteer.objects.get(Vol_ID=vd)
+    v_serializer = Vols_Serializer(vol_obj,many=False)
+    return Response(v_serializer.data)
+
+# -----Details of organization ------
+
+@api_view(['GET'])
+def Org_details(request,od):
+    Org_obj = Org.objects.get(Org_ID=od)
+    or_serializer = Orgs_serializer(Org_obj,many=False)
+    return Response(or_serializer.data)
+
+## -----Details of Events ------
+
+@api_view(['GET'])
+def event_details(request,ed):
+    e_obj = Events.objects.get(Event_ID = ed)
+    serilizer = EventSerializer(e_obj,many = False)
+    return Response(serilizer.data)
