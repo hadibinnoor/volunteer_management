@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from rest_framework.views import APIView
 #models--
 from base.models import Events,volunteer,Org
@@ -9,6 +9,8 @@ from rest_framework import status
 #serilizer---
 from base.serializers import EventSerializer,Vols_Serializer,Orgs_serializer
 from django.http import HttpResponse
+from .forms import EventsForm
+
 # Create your views here.
 
 class CreateEvent(APIView):
@@ -44,6 +46,17 @@ class ImageFile(APIView):
                 return response
 
         return Response(status=status.HTTP_404_NOT_FOUND)
+    
+def create_event(request):
+    if request.method == 'POST':
+        form = EventsForm(request.POST, request.FILES)
+        if form.is_valid():
+            event = form.save()
+            # Additional processing or redirect
+            return redirect('some-success-url')
+    else:
+        form = EventsForm()
+    return render(request, 'form.html', {'form': form})
     
 @api_view(['GET'])
 def events(request):
