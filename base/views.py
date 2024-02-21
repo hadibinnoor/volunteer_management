@@ -102,5 +102,6 @@ def Org_details(request,od):
 @api_view(['GET'])
 def event_details(request,ed):
     e_obj = Events.objects.get(Event_ID = ed)
+    Org_Name = e_obj.get_Org_Name()
     serilizer = EventSerializer(e_obj,many = False)
     return Response(serilizer.data)

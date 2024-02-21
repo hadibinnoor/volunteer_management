@@ -93,6 +93,11 @@ class Events(models.Model):
         ("COMING","Coming")
     ]
     Event_Status =models.CharField(choices = Event_type ,default = "COMING",max_length = 20) 
+
+    #To Get Org_Name---
+    def get_Org_Name(self):
+        return self.Created_Org.Org_Name
+
     def __str__(self):
         return self.Event_Name
     
