@@ -12,6 +12,10 @@ urlpatterns = [
     path('Volunteer/<int:vd>/',views.Volunteer_details),
     path('Org/<int:od>/',views.Org_details),
     path('newevent/', create_event, name='newevent'),
+    path("login/",views.LoginView.as_view(),name = "login"),
+    path("reg/volunteer/",views.VolunteerRegisterView.as_view(),name = "register"),
+    path("reg/Org/",views.OrgRegisterView.as_view(),name = "OrgRegister"),
 
-    
+
+ 
 ]

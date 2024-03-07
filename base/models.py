@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser,BaseUserManager 
+from django.contrib.auth.models import AbstractBaseUser,BaseUserManager,PermissionsMixin
 # Create your models here.
 import os
 
@@ -24,7 +24,7 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, Role, password, **extra_fields)
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser,PermissionsMixin):
     username = None
     email = models.EmailField(unique=True)
     user_type = (
@@ -32,10 +32,18 @@ class User(AbstractBaseUser):
         ("Vol","volunteer")
     )
     Role = models.CharField(choices = user_type, max_length=50)
+    
+    is_staff = models.BooleanField(default = False)
+    is_active = models.BooleanField(default = True)
+
     objects = CustomUserManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['Role']
-
+    
+    class Meta:
+        verbose_name = "User"
+        verbose_name_plural = "Users"
+    
     def __str__(self):
         return self.email
     
@@ -49,9 +57,9 @@ class volunteer(models.Model):
     ]
     user = models.OneToOneField(User, related_name ="vol_profile",on_delete=models.CASCADE)
     Vol_ID = models.BigAutoField(primary_key=True,unique=True)
-    Name = models.CharField(max_length=20)
+    Name = models.CharField(max_length=20,default = "empty")
     Gender = models.CharField(choices = Gender_type,max_length=50)
-    Age = models.PositiveIntegerField()
+    Age = models.PositiveIntegerField(default = 00)
     Location = models.CharField(max_length=50)
     profile_img = models.ImageField(upload_to='vol_profile/', null=True, blank=True)
 

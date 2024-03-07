@@ -13,3 +13,14 @@ class EventsForm(forms.ModelForm):
         self.fields['Event_Description'].widget.attrs.update({'class': 'form-control'})
         self.fields['Number_of_Volunteer'].widget.attrs.update({'class': 'form-control'})
         # Similarly, update other fields as needed
+
+
+class VolunteerForm(forms.Form):
+    email = forms.EmailField()
+    Password = forms.CharField(widget=forms.PasswordInput)
+    Name = forms.CharField(max_length=100)
+    Gender = forms.CharField(max_length=50)
+    Age = forms.IntegerField()
+    volunteer_id = forms.CharField(label='Volunteer ID', max_length=100, widget=forms.TextInput())
+    Location = forms.CharField(max_length=100)
+    profile_img = forms.ImageField()

@@ -1,15 +1,22 @@
 from django.shortcuts import redirect, render
 from rest_framework.views import APIView
 #models--
-from base.models import Events,volunteer,Org
+from base.models import Events,volunteer,Org,User
 from rest_framework.response import Response
 # apiview-
 from rest_framework.decorators import api_view
 from rest_framework import status
 #serilizer---
-from base.serializers import EventSerializer,Vols_Serializer,Orgs_serializer
+from base.serializers import EventSerializer,Vols_Serializer,Orgs_serializer,UserSerializer,VolunteerSerializer,OrganizationSerializer
 from django.http import HttpResponse
-from .forms import EventsForm
+# forms.py imports
+from .forms import EventsForm , VolunteerForm
+# authenticate
+from django.contrib.auth import authenticate,login,logout
+from rest_framework.authtoken.models import Token
+#-
+from django.contrib.auth.hashers import make_password
+from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
 # Create your views here.
 
@@ -105,3 +112,43 @@ def event_details(request,ed):
     Org_Name = e_obj.get_Org_Name()
     serilizer = EventSerializer(e_obj,many = False)
     return Response(serilizer.data)
+
+#Login
+
+class LoginView(APIView):
+  def post(self, request):
+    email = request.data.get('email')
+    password = request.data.get('password')
+
+    user = authenticate(email=email, password=password)
+    if user is not None:
+      if user.Role =="Vol":
+          return Response("login Successful as Volunteer")
+      else:
+          return Response("login Successful as Oranization")
+          
+    else:
+      return Response("Invalid Username or Password",status=401)
+
+
+
+# register Volunteer
+
+class VolunteerRegisterView(APIView):
+
+    def post(self, request, *args, **kwargs):
+        serializer = VolunteerSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+# Register Org
+    
+class OrgRegisterView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = OrganizationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
